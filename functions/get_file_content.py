@@ -1,0 +1,37 @@
+import os
+from functions.config import content_config
+
+# config
+character_limit = content_config.get('character_limit', 10000)
+        
+
+def count_characters(text):
+    return len(text)
+
+def get_file_content(working_directory, file_path):
+        
+    try:
+        full_path = os.path.join(working_directory, file_path)
+        abs_working_dir = os.path.abspath(working_directory)
+        abs_file_path = os.path.abspath(full_path)
+
+        # Ensure the target path is inside the working directory
+        if not abs_file_path.startswith(abs_working_dir):
+            return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
+        
+        # Ensure the target path exists and is a file
+        if not os.path.isfile(abs_file_path):
+            return f'Error: File not found or is not a regular file: "{file_path}"'
+
+        with open(abs_file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Check if the file_path exceeds character limit
+        if count_characters(content) > character_limit:
+            return content[:character_limit] + f"...File \"{file_path}\" truncated at {character_limit} characters"
+
+        return content
+    
+    except Exception as e:
+        return f"Error: {e}"
+
