@@ -1,5 +1,21 @@
 import os
 import sys
+from google.genai import types  
+
+# We won't allow the LLM to specify the working_directory parameter. We're going to hard code that.
+schema_get_files_info = types.FunctionDeclaration(
+    name="get_files_info",
+    description="Lists files in the specified directory along with their sizes, constrained to the working directory.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="The directory to list files from, relative to the working directory. If not provided, lists files in the working directory itself.",
+            ),
+        },
+    ),
+)
 
 def get_files_info(working_directory, directory="."):
     try:
@@ -25,7 +41,7 @@ def get_files_info(working_directory, directory="."):
                 size = os.path.getsize(content_path)
                 content_info.append(f"- {content}: file_size={size} bytes, is_dir={is_dir}")
             except Exception as e:
-                content_info.append(f"- {entry}: Error retrieving info ({str(e)})")
+                content_info.append(f"- {content}: Error retrieving info ({e})")
 
         return "\n".join(content_info) if content_info else f'No files found in directory "{directory}"'
     
@@ -41,3 +57,5 @@ def get_files_info(working_directory, directory="."):
 
 # if __name__ == '__main__':
 # main()
+
+

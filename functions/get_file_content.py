@@ -1,6 +1,23 @@
 import os
 from functions.config import content_config
 
+from google.genai import types  
+
+# We won't allow the LLM to specify the working_directory parameter. We're going to hard code that.
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="Retrieves the content of a file in the specified directory, constrained to the working directory.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The path to the file to retrieve content from, relative to the working directory.",
+            ),
+        },
+    ),
+)
+
 # config
 character_limit = content_config.get('character_limit', 10000)
         
@@ -34,4 +51,5 @@ def get_file_content(working_directory, file_path):
     
     except Exception as e:
         return f"Error: {e}"
+
 
